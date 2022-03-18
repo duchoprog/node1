@@ -1,3 +1,6 @@
+require('dotenv').config({path:'./variables.env'})
+
+console.log(process.env.DB_URL)
 module.exports = {
-    url: "mongodb://localhost:27017/duchoprog_db"
+    url: process.env.DB_URL
   };

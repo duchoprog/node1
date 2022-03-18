@@ -1,10 +1,14 @@
+require("dotenv").config({ path: "./config.env" });
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const path = require('path')
+const mongoose = require('mongoose')
+
+
 var corsOptions = {
-  origin: "http://localhost:8081"
+  origin: "http://localhost:3000"
 };
 app.use(cors(corsOptions));
 // parse requests of content-type - application/json
@@ -18,23 +22,27 @@ app.get("/", (req, res) => {
 
 //Serve static assets when in production
 if (process.env.NODE_ENV==='production'){
-  //Set static folder
-  app.use(express.static('client/build'));
+  //Set static folder.
+  app.use(express.static(path.join(__dirname, '/client/build')));
 
   app.get('*',(req,res)=>{
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
+    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+  })
+} else {
+  app.get ("/", (req,res)=>{
+    res.send("API running");
   })
 }
 ///
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8080;
+
 require("./app/routes/tutorial.routes")(app);
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
+const PORT = process.env.PORT;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 const db = require("./app/models");
+const { config } = require("process");
 db.mongoose
   .connect(db.url, {
     useNewUrlParser: true,
